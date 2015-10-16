@@ -70,8 +70,7 @@ wire [ 27: 0 ] aggregate_video;
 //=======================================================
 
 // Hello!! BIG HINT HERE! (It'll make your life easier)
-// TODO: fix here for DE1
-assign { GPIO_1[ 31: 3 ], GPIO_1[ 1 ] } = aggregate_video;
+assign { GPIO_1[ 31: 19 ], GPIO_1[ 17 ], GPIO_1[ 15: 3 ], GPIO_1[ 1 ] } = aggregate_video;
 assign aggregate_video = { disp_vsync, disp_hsync, disp_en, disp_clk, disp_blue, disp_green, disp_red };
 assign disp_en = pll_lock; // Enable the display just after PLL has locked
 
