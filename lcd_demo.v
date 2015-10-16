@@ -50,12 +50,69 @@ module lcd_demo(
          inout [ 35: 0 ] GPIO_1
        );
 
-//=======================================================
-//  REG/WIRE declarations
-//=======================================================
+// =======================================================
+// REG/WIRE declarations
+// =======================================================
+wire pll_lock;
+
+wire [ 9: 0 ] h_pos, v_pos;
+wire valid_draw, v_blank;
+
+wire en_switch;
+
+wire [ 7: 0 ] disp_red, disp_green, disp_blue;
+wire disp_clk, disp_en, disp_vsync, disp_hsync;
+
+wire [ 27: 0 ] aggregate_video;
 
 //=======================================================
-//  Structural coding
+// Input/Output assignments
 //=======================================================
+
+// Hello!! BIG HINT HERE! (It'll make your life easier)
+// TODO: fix here for DE1
+assign { GPIO_1[ 31: 3 ], GPIO_1[ 1 ] } = aggregate_video;
+assign aggregate_video = { disp_vsync, disp_hsync, disp_en, disp_clk, disp_blue, disp_green, disp_red };
+assign disp_en = pll_lock; // Enable the display just after PLL has locked
+
+// Operation of system:
+// Set SW[0] low, program device, set SW[0] high.
+assign en_switch = SW[ 0 ];
+
+// =======================================================
+// Structural coding
+// =======================================================
+
+video_pll pll(
+            .refclk( CLOCK_50 ),
+            .rst( 1'b0 ),
+            .outclk_0( disp_clk ),
+            .locked( pll_lock )
+          );
+
+// Control the video side of the world
+video_position_sync video_sync (
+                      .disp_clk( disp_clk ),
+                      .en( pll_lock ),
+                      .valid_draw( valid_draw ),
+                      .v_blank( v_blank ),
+                      .h_pos( h_pos ),
+                      .v_pos( v_pos ),
+                      .disp_hsync( disp_hsync ),
+                      .disp_vsync( disp_vsync )
+                    );
+
+demo_video video_gen
+           (
+             .clk( disp_clk ),
+             .en( en_switch ),
+             .x_pos( h_pos ),
+             .y_pos( v_pos ),
+             .valid_region( valid_draw ),
+             .v_blank( v_blank ),
+             .value_red( disp_red ),
+             .value_green( disp_green ),
+             .value_blue( disp_blue )
+           );
 
 endmodule
