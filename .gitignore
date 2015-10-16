@@ -23,6 +23,7 @@ timing
 *_generation_script*
 *_inst.vhd
 *.bak
+*.cdf
 *.cmp
 *.done
 *.eqn
@@ -38,6 +39,7 @@ timing
 *.qarlog
 *.qws
 *.rpt
+*.sld
 *.smsg
 *.sof
 *.sopc_builder
